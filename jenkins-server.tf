@@ -1,0 +1,43 @@
+resource "aws_security_group" "jenkins" {
+  name   = "jenkins-sg"
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "jenkins-sg"
+  }
+}
+
+resource "aws_instance" "jenkins" {
+  ami                    = "ami-0f918f7e67a3323f0"
+  instance_type          = "t3.micro"
+  subnet_id              = aws_subnet.public.id
+  vpc_security_group_ids = [aws_security_group.jenkins.id]
+  key_name               = "terraform-jenkins-key"
+
+  user_data = file("${path.module}/jenkins-server-script.sh")
+
+  tags = {
+    Name = "Jenkins-Server"
+  }
+}
