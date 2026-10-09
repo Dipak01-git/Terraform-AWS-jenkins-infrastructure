@@ -38,4 +38,17 @@ pipeline {
 
         stage('Terraform Plan') {
             steps {
-                sh 'ter…
+                sh 'terraform plan -input=false -no-color'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Terraform pipeline completed successfully.'
+        }
+        failure {
+            echo 'Pipeline failed. Check Console Output.'
+        }
+    }
+}
